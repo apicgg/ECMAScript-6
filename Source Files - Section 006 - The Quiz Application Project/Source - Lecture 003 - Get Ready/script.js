@@ -10,11 +10,28 @@ var quizController = (function () {
     this.options = options;
     this.correctAnswer = correctAnswer;
   }
+
+  var questionLocalStorage = {
+    setQuestionCollection: function (newCollection) {
+      localStorage.setItem('questionCollection', JSON.stringify(newCollection));
+    },
+    getQuestionCollection: function () {
+      return JSON.parse(localStorage.getItem('questionCollection'));
+    },
+    removeQuestionCollection: function () {
+      localStorage.removeItem('questionCollection');
+    },
+  };
+
   return {
     addQuestionOnLocalStorage: function (newQuestText, opts) {
-      var optionsArr, corrAns, questionId, newQuestion;
+      var optionsArr, corrAns, questionId, newQuestion, getStoredQuests;
+
+      if (questionLocalStorage.getQuestionCollection() === null) {
+        questionLocalStorage.setQuestionCollection([]);
+      }
+
       optionsArr = [];
-      questionId = 0;
       for (let i = 0; i < opts.length; i++) {
         if (opts[i].value !== '') {
           optionsArr.push(opts[i].value);
@@ -23,13 +40,19 @@ var quizController = (function () {
           corrAns = opts[i].value;
         }
       }
-      newQuestion = new Question(
-        questionId,
-        newQuestText.value,
-        optionsArr,
-        corrAns
-      );
-      console.log(newQuestion);
+      // [{id:0}, {id:1}]
+      if (questionLocalStorage.getQuestionCollection().length > 0) {
+        questionId = questionLocalStorage.getQuestionCollection()[questionLocalStorage.getQuestionCollection().length - 1].id + 1;
+      } else {
+        questionId = 0;
+      }
+      newQuestion = new Question(questionId, newQuestText.value, optionsArr, corrAns);
+
+      getStoredQuests = questionLocalStorage.getQuestionCollection();
+      getStoredQuests.push(newQuestion);
+      questionLocalStorage.setQuestionCollection(getStoredQuests);
+
+      console.log(questionLocalStorage.getQuestionCollection());
     },
   };
 })();
@@ -55,9 +78,6 @@ var UIController = (function () {
 var controller = (function (quizCtrl, UICtrl) {
   var selectedDomItems = UICtrl.getDomItems;
   selectedDomItems.questInsertBtn.addEventListener('click', function () {
-    quizCtrl.addQuestionOnLocalStorage(
-      selectedDomItems.newQuestionText,
-      selectedDomItems.adminOptions
-    );
+    quizCtrl.addQuestionOnLocalStorage(selectedDomItems.newQuestionText, selectedDomItems.adminOptions);
   });
 })(quizController, UIController);

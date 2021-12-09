@@ -26,12 +26,7 @@ var quizController = (function () {
 
   return {
     addQuestionOnLocalStorage: function (newQuestText, opts) {
-      var optionsArr,
-        corrAns,
-        questionId,
-        newQuestion,
-        getStoredQuests,
-        isChecked;
+      var optionsArr, corrAns, questionId, newQuestion, getStoredQuests, isChecked;
 
       // * Need to initialize local storage in browser with an empty array//
       if (questionLocalStorage.getQuestionCollection() === null) {
@@ -55,10 +50,7 @@ var quizController = (function () {
 
       // * For setting up questionId dynamically //
       if (questionLocalStorage.getQuestionCollection().length > 0) {
-        questionId =
-          questionLocalStorage.getQuestionCollection()[
-            questionLocalStorage.getQuestionCollection().length - 1
-          ].id + 1;
+        questionId = questionLocalStorage.getQuestionCollection()[questionLocalStorage.getQuestionCollection().length - 1].id + 1;
       } else {
         questionId = 0;
       }
@@ -68,12 +60,7 @@ var quizController = (function () {
         if (optionsArr.length > 1) {
           if (isChecked) {
             // * New array of adding questions as object//
-            newQuestion = new Question(
-              questionId,
-              newQuestText.value,
-              optionsArr,
-              corrAns
-            );
+            newQuestion = new Question(questionId, newQuestText.value, optionsArr, corrAns);
 
             getStoredQuests = questionLocalStorage.getQuestionCollection();
             getStoredQuests.push(newQuestion);
@@ -117,31 +104,12 @@ var UIController = (function () {
       var addInput = function () {
         var inputHTML, z;
         z = document.querySelectorAll('.admin-option').length;
-        inputHTML =
-          '<div class="admin-option-wrapper"><input type="radio"class="admin-option-' +
-          z +
-          '"name="answer"value="' +
-          z +
-          '"/><input type="text" class="admin-option admin-option-' +
-          z +
-          '" value="" /></div>';
-        domItems.adminOptionsContainer.insertAdjacentHTML(
-          'beforeend',
-          inputHTML
-        );
-        domItems.adminOptionsContainer.lastElementChild.previousElementSibling.lastElementChild.removeEventListener(
-          'focus',
-          addInput
-        );
-        domItems.adminOptionsContainer.lastElementChild.lastElementChild.addEventListener(
-          'focus',
-          addInput
-        );
+        inputHTML = '<div class="admin-option-wrapper"><input type="radio"class="admin-option-' + z + '"name="answer"value="' + z + '"/><input type="text" class="admin-option admin-option-' + z + '" value="" /></div>';
+        domItems.adminOptionsContainer.insertAdjacentHTML('beforeend', inputHTML);
+        domItems.adminOptionsContainer.lastElementChild.previousElementSibling.lastElementChild.removeEventListener('focus', addInput);
+        domItems.adminOptionsContainer.lastElementChild.lastElementChild.addEventListener('focus', addInput);
       };
-      domItems.adminOptionsContainer.lastElementChild.lastElementChild.addEventListener(
-        'focus',
-        addInput
-      );
+      domItems.adminOptionsContainer.lastElementChild.lastElementChild.addEventListener('focus', addInput);
     },
   };
 })();
@@ -155,9 +123,6 @@ var controller = (function (quizCtrl, UICtrl) {
   UICtrl.addInputsDynamically();
   selectedDomItems.questInsertBtn.addEventListener('click', function () {
     var adminOptions = document.querySelectorAll('.admin-option');
-    quizCtrl.addQuestionOnLocalStorage(
-      selectedDomItems.newQuestionText,
-      adminOptions
-    );
+    quizCtrl.addQuestionOnLocalStorage(selectedDomItems.newQuestionText, adminOptions);
   });
 })(quizController, UIController);
