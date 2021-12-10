@@ -25,12 +25,7 @@ var quizController = (function () {
 
   return {
     addQuestionOnLocalStorage: function (newQuestText, opts) {
-      var optionsArr,
-        corrAns,
-        questionId,
-        newQuestion,
-        getStoredQuests,
-        isChecked;
+      var optionsArr, corrAns, questionId, newQuestion, getStoredQuests, isChecked;
 
       if (questionLocalStorage.getQuestionCollection() === null) {
         questionLocalStorage.setQuestionCollection([]);
@@ -50,22 +45,14 @@ var quizController = (function () {
       }
       // [{id:0}, {id:1}]
       if (questionLocalStorage.getQuestionCollection().length > 0) {
-        questionId =
-          questionLocalStorage.getQuestionCollection()[
-            questionLocalStorage.getQuestionCollection().length - 1
-          ].id + 1;
+        questionId = questionLocalStorage.getQuestionCollection()[questionLocalStorage.getQuestionCollection().length - 1].id + 1;
       } else {
         questionId = 0;
       }
       if (newQuestText.value !== '') {
         if (optionsArr.length > 1) {
           if (isChecked) {
-            newQuestion = new Question(
-              questionId,
-              newQuestText.value,
-              optionsArr,
-              corrAns
-            );
+            newQuestion = new Question(questionId, newQuestText.value, optionsArr, corrAns);
 
             getStoredQuests = questionLocalStorage.getQuestionCollection();
             getStoredQuests.push(newQuestion);
@@ -106,26 +93,18 @@ var UIController = (function () {
     getDomItems: domItems,
     addInputsDynamically: function () {
       var addInput = function () {
-        var z = document.querySelectorAll('.admin-option').length;
-        var inputHTML =
-          '<div class="admin-option-wrapper"><input type="radio" class="admin-option-' +
-          z +
-          '" name="answer" value="' +
-          z +
-          '" /><input type="text" class="admin-option admin-option-' +
-          z +
-          '" value="" />< /div >';
+        // var z = document.querySelectorAll('.admin-option').length;
+        var z = domItems.adminOptions.length;
+        var inputHTML = '<div class="admin-option-wrapper"><input type="radio" class="admin-option-' + z + '" name="answer" value="' + z + '" /><input type="text" class="admin-option admin-option-' + z + '" value="" />< /div >';
 
-        domItems.adminOptionsContainer.insertAdjacentHTML(
-          'beforeend',
-          inputHTML
-        );
+        domItems.adminOptionsContainer.insertAdjacentHTML('beforeend', inputHTML);
+
+        domItems.adminOptionsContainer.lastElementChild.previousElementSibling.lastElementChild.removeEventListener('focus', addInput);
+
+        domItems.adminOptionsContainer.lastElementChild.lastElementChild.addEventListener('focus', addInput);
       };
 
-      domItems.adminOptionsContainer.lastElementChild.lastElementChild.addEventListener(
-        'focus',
-        addInput
-      );
+      domItems.adminOptionsContainer.lastElementChild.lastElementChild.addEventListener('focus', addInput);
     },
   };
 })();
@@ -139,9 +118,8 @@ var controller = (function (quizCtrl, UICtrl) {
   UICtrl.addInputsDynamically();
 
   selectedDomItems.questInsertBtn.addEventListener('click', function () {
-    quizCtrl.addQuestionOnLocalStorage(
-      selectedDomItems.newQuestionText,
-      selectedDomItems.adminOptions
-    );
+    var adminOptions = document.querySelectorAll('.admin-option');
+
+    quizCtrl.addQuestionOnLocalStorage(selectedDomItems.newQuestionText, adminOptions);
   });
 })(quizController, UIController);
