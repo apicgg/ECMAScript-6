@@ -23,13 +23,20 @@ var quizController = (function () {
     },
   };
 
-  return {
-    addQuestionOnLocalStorage: function (newQuestText, opts) {
-      var optionsArr, corrAns, questionId, newQuestion, getStoredQuests, isChecked;
+  if (questionLocalStorage.getQuestionCollection() === null) {
+    questionLocalStorage.setQuestionCollection([]);
+  }
 
-      if (questionLocalStorage.getQuestionCollection() === null) {
-        questionLocalStorage.setQuestionCollection([]);
-      }
+  return {
+    getQuestionLocalStorage: questionLocalStorage,
+
+    addQuestionOnLocalStorage: function (newQuestText, opts) {
+      var optionsArr,
+        corrAns,
+        questionId,
+        newQuestion,
+        getStoredQuests,
+        isChecked;
 
       optionsArr = [];
       isChecked = false;
@@ -45,14 +52,22 @@ var quizController = (function () {
       }
       // [{id:0}, {id:1}]
       if (questionLocalStorage.getQuestionCollection().length > 0) {
-        questionId = questionLocalStorage.getQuestionCollection()[questionLocalStorage.getQuestionCollection().length - 1].id + 1;
+        questionId =
+          questionLocalStorage.getQuestionCollection()[
+            questionLocalStorage.getQuestionCollection().length - 1
+          ].id + 1;
       } else {
         questionId = 0;
       }
       if (newQuestText.value !== '') {
         if (optionsArr.length > 1) {
           if (isChecked) {
-            newQuestion = new Question(questionId, newQuestText.value, optionsArr, corrAns);
+            newQuestion = new Question(
+              questionId,
+              newQuestText.value,
+              optionsArr,
+              corrAns
+            );
 
             getStoredQuests = questionLocalStorage.getQuestionCollection();
             getStoredQuests.push(newQuestion);
@@ -64,15 +79,19 @@ var quizController = (function () {
               opts[i].previousElementSibling.checked = false;
             }
 
-            console.log(getStoredQuests);
+            // console.log(getStoredQuests);
+            return true;
           } else {
             alert('You need to select correct answer!');
+            return false;
           }
         } else {
           alert('You need to add at least two options!');
+          return false;
         }
       } else {
         alert('You need to add question!');
+        return false;
       }
     },
   };
@@ -88,6 +107,9 @@ var UIController = (function () {
     newQuestionText: document.getElementById('new-question-text'),
     adminOptions: document.querySelectorAll('.admin-option'),
     adminOptionsContainer: document.querySelector('.admin-options-container'),
+    insertedQuestsWrapper: document.querySelector(
+      '.inserted-questions-wrapper'
+    ),
   };
   return {
     getDomItems: domItems,
@@ -95,16 +117,61 @@ var UIController = (function () {
       var addInput = function () {
         // var z = document.querySelectorAll('.admin-option').length;
         var z = domItems.adminOptions.length;
-        var inputHTML = '<div class="admin-option-wrapper"><input type="radio" class="admin-option-' + z + '" name="answer" value="' + z + '" /><input type="text" class="admin-option admin-option-' + z + '" value="" />< /div >';
+        var inputHTML =
+          '<div class="admin-option-wrapper"><input type="radio" class="admin-option-' +
+          z +
+          '" name="answer" value="' +
+          z +
+          '" /><input type="text" class="admin-option admin-option-' +
+          z +
+          '" value="" />< /div >';
 
-        domItems.adminOptionsContainer.insertAdjacentHTML('beforeend', inputHTML);
+        domItems.adminOptionsContainer.insertAdjacentHTML(
+          'beforeend',
+          inputHTML
+        );
 
-        domItems.adminOptionsContainer.lastElementChild.previousElementSibling.lastElementChild.removeEventListener('focus', addInput);
+        domItems.adminOptionsContainer.lastElementChild.previousElementSibling.lastElementChild.removeEventListener(
+          'focus',
+          addInput
+        );
 
-        domItems.adminOptionsContainer.lastElementChild.lastElementChild.addEventListener('focus', addInput);
+        domItems.adminOptionsContainer.lastElementChild.lastElementChild.addEventListener(
+          'focus',
+          addInput
+        );
       };
 
-      domItems.adminOptionsContainer.lastElementChild.lastElementChild.addEventListener('focus', addInput);
+      domItems.adminOptionsContainer.lastElementChild.lastElementChild.addEventListener(
+        'focus',
+        addInput
+      );
+    },
+
+    createQuestionList: function (getQuestions) {
+      var questHTML, numberingArr;
+
+      numberingArr = [];
+
+      domItems.insertedQuestsWrapper.innerHTML = '';
+
+      for (let i = 0; i < getQuestions.getQuestionCollection().length; i++) {
+        numberingArr.push(i + 1);
+
+        questHTML =
+          '<p><span>' +
+          numberingArr[i] +
+          '. ' +
+          getQuestions.getQuestionCollection()[i].questionText +
+          '</span><button id="question-' +
+          getQuestions.getQuestionCollection()[i].id +
+          '">Edit</button></p>';
+
+        domItems.insertedQuestsWrapper.insertAdjacentHTML(
+          'afterbegin',
+          questHTML
+        );
+      }
     },
   };
 })();
@@ -117,9 +184,19 @@ var controller = (function (quizCtrl, UICtrl) {
 
   UICtrl.addInputsDynamically();
 
+  UICtrl.createQuestionList(quizCtrl.getQuestionLocalStorage);
+
   selectedDomItems.questInsertBtn.addEventListener('click', function () {
     var adminOptions = document.querySelectorAll('.admin-option');
 
-    quizCtrl.addQuestionOnLocalStorage(selectedDomItems.newQuestionText, adminOptions);
+    var checkBoolean = quizCtrl.addQuestionOnLocalStorage(
+      selectedDomItems.newQuestionText,
+      adminOptions
+    );
+
+    //This is dynamically add questions into the question list without browser refresh!!
+    if (checkBoolean) {
+      UICtrl.createQuestionList(quizCtrl.getQuestionLocalStorage);
+    }
   });
 })(quizController, UIController);
