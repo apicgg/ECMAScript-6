@@ -31,12 +31,7 @@ var quizController = (function () {
     getQuestionLocalStorage: questionLocalStorage,
 
     addQuestionOnLocalStorage: function (newQuestText, opts) {
-      var optionsArr,
-        corrAns,
-        questionId,
-        newQuestion,
-        getStoredQuests,
-        isChecked;
+      var optionsArr, corrAns, questionId, newQuestion, getStoredQuests, isChecked;
 
       optionsArr = [];
       isChecked = false;
@@ -52,22 +47,14 @@ var quizController = (function () {
       }
       // [{id:0}, {id:1}]
       if (questionLocalStorage.getQuestionCollection().length > 0) {
-        questionId =
-          questionLocalStorage.getQuestionCollection()[
-            questionLocalStorage.getQuestionCollection().length - 1
-          ].id + 1;
+        questionId = questionLocalStorage.getQuestionCollection()[questionLocalStorage.getQuestionCollection().length - 1].id + 1;
       } else {
         questionId = 0;
       }
       if (newQuestText.value !== '') {
         if (optionsArr.length > 1) {
           if (isChecked) {
-            newQuestion = new Question(
-              questionId,
-              newQuestText.value,
-              optionsArr,
-              corrAns
-            );
+            newQuestion = new Question(questionId, newQuestText.value, optionsArr, corrAns);
 
             getStoredQuests = questionLocalStorage.getQuestionCollection();
             getStoredQuests.push(newQuestion);
@@ -107,9 +94,7 @@ var UIController = (function () {
     newQuestionText: document.getElementById('new-question-text'),
     adminOptions: document.querySelectorAll('.admin-option'),
     adminOptionsContainer: document.querySelector('.admin-options-container'),
-    insertedQuestsWrapper: document.querySelector(
-      '.inserted-questions-wrapper'
-    ),
+    insertedQuestsWrapper: document.querySelector('.inserted-questions-wrapper'),
   };
   return {
     getDomItems: domItems,
@@ -117,35 +102,16 @@ var UIController = (function () {
       var addInput = function () {
         // var z = document.querySelectorAll('.admin-option').length;
         var z = domItems.adminOptions.length;
-        var inputHTML =
-          '<div class="admin-option-wrapper"><input type="radio" class="admin-option-' +
-          z +
-          '" name="answer" value="' +
-          z +
-          '" /><input type="text" class="admin-option admin-option-' +
-          z +
-          '" value="" />< /div >';
+        var inputHTML = '<div class="admin-option-wrapper"><input type="radio" class="admin-option-' + z + '" name="answer" value="' + z + '" /><input type="text" class="admin-option admin-option-' + z + '" value="" />< /div >';
 
-        domItems.adminOptionsContainer.insertAdjacentHTML(
-          'beforeend',
-          inputHTML
-        );
+        domItems.adminOptionsContainer.insertAdjacentHTML('beforeend', inputHTML);
 
-        domItems.adminOptionsContainer.lastElementChild.previousElementSibling.lastElementChild.removeEventListener(
-          'focus',
-          addInput
-        );
+        domItems.adminOptionsContainer.lastElementChild.previousElementSibling.lastElementChild.removeEventListener('focus', addInput);
 
-        domItems.adminOptionsContainer.lastElementChild.lastElementChild.addEventListener(
-          'focus',
-          addInput
-        );
+        domItems.adminOptionsContainer.lastElementChild.lastElementChild.addEventListener('focus', addInput);
       };
 
-      domItems.adminOptionsContainer.lastElementChild.lastElementChild.addEventListener(
-        'focus',
-        addInput
-      );
+      domItems.adminOptionsContainer.lastElementChild.lastElementChild.addEventListener('focus', addInput);
     },
 
     createQuestionList: function (getQuestions) {
@@ -158,19 +124,23 @@ var UIController = (function () {
       for (let i = 0; i < getQuestions.getQuestionCollection().length; i++) {
         numberingArr.push(i + 1);
 
-        questHTML =
-          '<p><span>' +
-          numberingArr[i] +
-          '. ' +
-          getQuestions.getQuestionCollection()[i].questionText +
-          '</span><button id="question-' +
-          getQuestions.getQuestionCollection()[i].id +
-          '">Edit</button></p>';
+        questHTML = '<p><span>' + numberingArr[i] + '. ' + getQuestions.getQuestionCollection()[i].questionText + '</span><button id="question-' + getQuestions.getQuestionCollection()[i].id + '">Edit</button></p>';
 
-        domItems.insertedQuestsWrapper.insertAdjacentHTML(
-          'afterbegin',
-          questHTML
-        );
+        domItems.insertedQuestsWrapper.insertAdjacentHTML('afterbegin', questHTML);
+      }
+    },
+
+    editQuestList: function (event, storageQuestList) {
+      var getId, getStorageQuestList, foundItem;
+
+      if ('question-'.indexOf(event.target.id)) {
+        getId = parseInt(event.target.id.split('-')[1]);
+        getStorageQuestList = storageQuestList.getQuestionCollection();
+        for (let i = 0; i < getStorageQuestList.length; i++) {
+          if (getStorageQuestList[i].id === getId) {
+            foundItem = getStorageQuestList[i];
+          }
+        }
       }
     },
   };
@@ -189,14 +159,14 @@ var controller = (function (quizCtrl, UICtrl) {
   selectedDomItems.questInsertBtn.addEventListener('click', function () {
     var adminOptions = document.querySelectorAll('.admin-option');
 
-    var checkBoolean = quizCtrl.addQuestionOnLocalStorage(
-      selectedDomItems.newQuestionText,
-      adminOptions
-    );
+    var checkBoolean = quizCtrl.addQuestionOnLocalStorage(selectedDomItems.newQuestionText, adminOptions);
 
     //This is dynamically add questions into the question list without browser refresh!!
     if (checkBoolean) {
       UICtrl.createQuestionList(quizCtrl.getQuestionLocalStorage);
     }
+  });
+  selectedDomItems.insertedQuestsWrapper.addEventListener('click', function (e) {
+    UICtrl.editQuestList(e, quizCtrl.getQuestionLocalStorage);
   });
 })(quizController, UIController);
