@@ -131,7 +131,7 @@ var UIController = (function () {
     },
 
     editQuestList: function (event, storageQuestList) {
-      var getId, getStorageQuestList, foundItem;
+      var getId, getStorageQuestList, foundItem, placeInArr, optionHTML;
 
       if ('question-'.indexOf(event.target.id)) {
         getId = parseInt(event.target.id.split('-')[1]);
@@ -139,8 +139,18 @@ var UIController = (function () {
         for (let i = 0; i < getStorageQuestList.length; i++) {
           if (getStorageQuestList[i].id === getId) {
             foundItem = getStorageQuestList[i];
+            placeInArr = i;
           }
         }
+        // console.log(foundItem, placeInArr);
+        domItems.newQuestionText.value = foundItem.questionText;
+        domItems.adminOptionsContainer.innerHTML = '';
+        optionHTML = '';
+        for (let i = 0; i < foundItem.options.length; i++) {
+          optionHTML += '<div class="admin-option-wrapper"><input type="radio" class="admin-option-' + i + '" name="answer" value="' + i + '"><input type="text" class="admin-option admin-option-' + i + '" value="' + foundItem.options[i] + '"></div>';
+        }
+        // console.log(optionHTML);
+        domItems.adminOptionsContainer.innerHTML = optionHTML;
       }
     },
   };
