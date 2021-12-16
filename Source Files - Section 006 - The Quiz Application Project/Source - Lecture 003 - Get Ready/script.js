@@ -105,7 +105,7 @@ var UIController = (function () {
       var addInput = function () {
         // var z = document.querySelectorAll('.admin-option').length;
         var z = domItems.adminOptions.length;
-        var inputHTML = '<div class="admin-option-wrapper"><input type="radio" class="admin-option-' + z + '" name="answer" value="' + z + '" /><input type="text" class="admin-option admin-option-' + z + '" value="" />< /div >';
+        var inputHTML = '<div class="admin-option-wrapper"><input type="radio" class="admin-option-' + z + '" name="answer" value="' + z + '" /><input type="text" class="admin-option admin-option-' + z + '" value="" /></div >';
 
         domItems.adminOptionsContainer.insertAdjacentHTML('beforeend', inputHTML);
 
@@ -178,6 +178,22 @@ var UIController = (function () {
                 foundItem.correctAnswer = optionEls[i].value;
               }
             }
+          }
+          foundItem.options = newOptions;
+
+          if (foundItem.questionText !== '') {
+            if (foundItem.options.length > 1) {
+              if (foundItem.correctAnswer !== '') {
+                getStorageQuestList.splice(placeInArr, 1, foundItem);
+                storageQuestList.setQuestionCollection(getStorageQuestList);
+              } else {
+                alert('You need to select correct answer!');
+              }
+            } else {
+              alert('You need to insert at least two options!');
+            }
+          } else {
+            alert('Please insert question!');
           }
         };
         domItems.questUpdateBtn.onclick = updateQuestion;
