@@ -95,6 +95,9 @@ var UIController = (function () {
     adminOptions: document.querySelectorAll('.admin-option'),
     adminOptionsContainer: document.querySelector('.admin-options-container'),
     insertedQuestsWrapper: document.querySelector('.inserted-questions-wrapper'),
+    questUpdateBtn: document.getElementById('question-update-btn'),
+    questDeleteBtn: document.getElementById('question-delete-btn'),
+    questsClearBtn: document.getElementById('questions-clear-btn'),
   };
   return {
     getDomItems: domItems,
@@ -130,7 +133,7 @@ var UIController = (function () {
       }
     },
 
-    editQuestList: function (event, storageQuestList) {
+    editQuestList: function (event, storageQuestList, addInpsDynFn) {
       var getId, getStorageQuestList, foundItem, placeInArr, optionHTML;
 
       if ('question-'.indexOf(event.target.id)) {
@@ -151,6 +154,33 @@ var UIController = (function () {
         }
         // console.log(optionHTML);
         domItems.adminOptionsContainer.innerHTML = optionHTML;
+        domItems.questUpdateBtn.style.visibility = 'visible';
+        domItems.questDeleteBtn.style.visibility = 'visible';
+        domItems.questInsertBtn.style.visibility = 'hidden';
+        domItems.questsClearBtn.style.pointerEvents = 'none';
+        addInpsDynFn();
+
+        // console.log(foundItem);
+        var updateQuestion = function () {
+          var newOptions, optionEls;
+
+          newOptions = [];
+          optionEls = document.querySelectorAll('.admin-option');
+
+          foundItem.questionText = domItems.newQuestionText.value;
+          foundItem.correctAnswer = '';
+
+          for (let i = 0; i < optionEls.length; i++) {
+            if (optionEls[i] !== '') {
+              // console.log(optionEls[i].value);
+              newOptions.push(optionEls[i].value);
+              if (optionEls[i].previousElementSibling.checked) {
+                foundItem.correctAnswer = optionEls[i].value;
+              }
+            }
+          }
+        };
+        domItems.questUpdateBtn.onclick = updateQuestion;
       }
     },
   };
@@ -177,6 +207,6 @@ var controller = (function (quizCtrl, UICtrl) {
     }
   });
   selectedDomItems.insertedQuestsWrapper.addEventListener('click', function (e) {
-    UICtrl.editQuestList(e, quizCtrl.getQuestionLocalStorage);
+    UICtrl.editQuestList(e, quizCtrl.getQuestionLocalStorage, UICtrl.addInputsDynamically);
   });
 })(quizController, UIController);
