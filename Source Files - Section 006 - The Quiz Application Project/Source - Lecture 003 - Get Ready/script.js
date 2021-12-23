@@ -133,7 +133,7 @@ var UIController = (function () {
       }
     },
 
-    editQuestList: function (event, storageQuestList, addInpsDynFn) {
+    editQuestList: function (event, storageQuestList, addInpsDynFn, updateQuestListFn) {
       var getId, getStorageQuestList, foundItem, placeInArr, optionHTML;
 
       if ('question-'.indexOf(event.target.id)) {
@@ -158,6 +158,7 @@ var UIController = (function () {
         domItems.questDeleteBtn.style.visibility = 'visible';
         domItems.questInsertBtn.style.visibility = 'hidden';
         domItems.questsClearBtn.style.pointerEvents = 'none';
+
         addInpsDynFn();
 
         // console.log(foundItem);
@@ -186,6 +187,16 @@ var UIController = (function () {
               if (foundItem.correctAnswer !== '') {
                 getStorageQuestList.splice(placeInArr, 1, foundItem);
                 storageQuestList.setQuestionCollection(getStorageQuestList);
+                domItems.newQuestionText.value = '';
+                for (let i = 0; i < optionEls.length; i++) {
+                  optionEls[i].value = '';
+                  optionEls[i].previousElementSibling.checked = false;
+                }
+
+                domItems.questUpdateBtn.style.visibility = 'hidden';
+                domItems.questDeleteBtn.style.visibility = 'hidden';
+                domItems.questInsertBtn.style.visibility = 'visible';
+                domItems.questsClearBtn.style.pointerEvents = '';
               } else {
                 alert('You need to select correct answer!');
               }
@@ -223,6 +234,6 @@ var controller = (function (quizCtrl, UICtrl) {
     }
   });
   selectedDomItems.insertedQuestsWrapper.addEventListener('click', function (e) {
-    UICtrl.editQuestList(e, quizCtrl.getQuestionLocalStorage, UICtrl.addInputsDynamically);
+    UICtrl.editQuestList(e, quizCtrl.getQuestionLocalStorage, UICtrl.addInputsDynamically, UICtrl.createQuestionList);
   });
 })(quizController, UIController);
