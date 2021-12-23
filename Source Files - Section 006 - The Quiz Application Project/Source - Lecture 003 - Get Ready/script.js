@@ -171,8 +171,8 @@ var UIController = (function () {
           foundItem.correctAnswer = '';
 
           for (let i = 0; i < optionEls.length; i++) {
-            if (optionEls[i] !== '') {
-              // console.log(optionEls[i].value);
+            if (optionEls[i].value !== '') {
+              console.log(optionEls[i].value);
               newOptions.push(optionEls[i].value);
               if (optionEls[i].previousElementSibling.checked) {
                 foundItem.correctAnswer = optionEls[i].value;
