@@ -18,39 +18,8 @@ names.forEach(function(name) {
 });
 */
 
+var names = ['Anurag', 'APiC', 'Ceb'];
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+names.forEach(function (name) {
+  console.log(name);
+});

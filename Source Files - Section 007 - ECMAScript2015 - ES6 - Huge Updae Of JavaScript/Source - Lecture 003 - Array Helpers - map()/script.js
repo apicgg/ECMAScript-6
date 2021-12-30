@@ -46,32 +46,10 @@ console.log(persons);
 console.log(getFirstNames);
 */
 
+var numbers = [1, 2, 3, 4, 5];
 
+var mapArr = numbers.map(function (number) {
+  return number * 10;
+});
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+console.log(mapArr);
